@@ -1,15 +1,33 @@
 # Deployment Guide
 
-Quick deployment guide for the Zoho Expense sync application.
+Quick deployment guide for the Zoho Expense sync application with Supabase database.
 
-## Railway Deployment (Recommended)
+## Railway + Supabase Deployment (Recommended)
 
 ### 1. Prerequisites
 - GitHub account with this repository
 - Railway account ([railway.app](https://railway.app))
+- Supabase account ([supabase.com](https://supabase.com)) - **FREE TIER**
 - Zoho Expense account with admin access
 
-### 2. Setup Zoho OAuth App
+### 2. Setup Supabase Database (FREE)
+
+1. **Create Supabase Project**:
+   - Go to [supabase.com](https://supabase.com)
+   - Sign up (free forever)
+   - Click "New Project"
+   - Choose organization
+   - Set project name: "expense-tracking"
+   - Set database password (save this!)
+   - Select region closest to you
+
+2. **Get Connection String**:
+   - In Supabase dashboard → Settings → Database
+   - Copy the "URI" connection string
+   - It looks like: `postgresql://postgres:[password]@db.[ref].supabase.co:5432/postgres`
+   - Save this for step 4
+
+### 3. Setup Zoho OAuth App
 
 1. Go to [Zoho API Console](https://api-console.zoho.com/)
 2. Create a new **Server-based Application**
@@ -20,21 +38,23 @@ Quick deployment guide for the Zoho Expense sync application.
 4. Set **Scopes**: `ZohoExpense.expenses.READ,ZohoExpense.reports.READ,ZohoExpense.files.READ`
 5. Save your **Client ID** and **Client Secret**
 
-### 3. Deploy to Railway
+### 4. Deploy to Railway
 
 1. **Connect Repository**:
    - Login to Railway
    - Create new project
    - Connect this GitHub repository
 
-2. **Add PostgreSQL**:
-   - In Railway dashboard, click "New"
-   - Select "Database" → "PostgreSQL"
-   - This automatically provides `DATABASE_URL`
+2. **No PostgreSQL needed**:
+   - Skip adding Railway PostgreSQL service
+   - We're using Supabase instead (free!)
 
 3. **Configure Environment Variables**:
    ```bash
-   # Required - Your Zoho credentials
+   # Required - Your Supabase database (from step 2)
+   DATABASE_URL=postgresql://postgres:your-password@db.your-ref.supabase.co:5432/postgres
+
+   # Required - Your Zoho credentials (from step 3)
    ZOHO_CLIENT_ID=your_client_id_here
    ZOHO_CLIENT_SECRET=your_client_secret_here
 
@@ -42,7 +62,7 @@ Quick deployment guide for the Zoho Expense sync application.
    ENCRYPTION_KEY=<generate with: python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())">
    ADMIN_TOKEN=sync my expenses please
 
-   # Auto-configured by Railway
+   # Railway configuration
    APP_BASE_URL=https://your-app-name.up.railway.app
 
    # Optional (defaults shown)
@@ -54,7 +74,7 @@ Quick deployment guide for the Zoho Expense sync application.
    - Railway will automatically build and deploy
    - Wait for deployment to complete (2-3 minutes)
 
-### 4. Initial Setup
+### 5. Initial Setup
 
 1. **Test Health**: Visit `https://your-app-name.up.railway.app/health`
 2. **Authorize Zoho**: Visit `https://your-app-name.up.railway.app/oauth/zoho/login`
@@ -63,6 +83,21 @@ Quick deployment guide for the Zoho Expense sync application.
    curl -X POST "https://your-app-name.up.railway.app/admin/sync?secret=sync my expenses please"
    ```
 4. **View Reports**: Visit `https://your-app-name.up.railway.app/reports/summary`
+5. **Optional**: View data in Supabase dashboard → Table Editor
+
+## 💰 Cost Breakdown
+
+### Supabase (Database)
+- **Free Tier**: 500MB database, unlimited API requests
+- **Handles**: 50,000+ expense records easily
+- **Cost**: $0/month forever
+
+### Railway (Application Hosting)
+- **Free Tier**: Limited usage
+- **Hobby Plan**: $5/month for personal projects
+- **Pro Plan**: $20/month for production use
+
+**Total**: $0-5/month for personal expense tracking
 
 ### 5. API Documentation
 

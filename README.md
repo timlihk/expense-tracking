@@ -42,10 +42,23 @@ Perfect for individuals, small businesses, or teams who want full control over t
 
 ### Prerequisites
 - **Zoho Expense account** with API access
+- **Supabase account** (free tier: 500MB PostgreSQL database)
 - **Railway account** (or any Docker hosting platform)
 - **5 minutes** for setup
 
-### 1. Zoho OAuth Setup
+### 1. Database Setup (Supabase)
+Create a free PostgreSQL database with Supabase:
+1. **Sign up** at [supabase.com](https://supabase.com) (free forever)
+2. **Create new project** → Choose organization → Set database password
+3. **Get connection details**: Go to Settings → Database → Copy "URI"
+4. **Save the connection string** (you'll need it for deployment)
+
+Example connection string:
+```
+postgresql://postgres:your-password@db.your-ref.supabase.co:5432/postgres
+```
+
+### 2. Zoho OAuth Setup
 Create a Zoho OAuth app at [Zoho API Console](https://api-console.zoho.com/):
 - **Application Type**: Server-based Application
 - **Redirect URI**: `https://your-app.railway.app/oauth/zoho/callback`
@@ -53,15 +66,17 @@ Create a Zoho OAuth app at [Zoho API Console](https://api-console.zoho.com/):
 
 Save your `Client ID` and `Client Secret`.
 
-### 2. Deploy to Railway
+### 3. Deploy to Railway
 
 [![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/new)
 
 1. **Connect this GitHub repository** to Railway
-2. **Add PostgreSQL service** (Railway will auto-provide `DATABASE_URL`)
-3. **Set environment variables**:
+2. **Set environment variables** (no need for additional PostgreSQL service):
 
 ```bash
+# Required - Your Supabase database connection
+DATABASE_URL=postgresql://postgres:your-password@db.your-ref.supabase.co:5432/postgres
+
 # Required - Your Zoho OAuth credentials
 ZOHO_CLIENT_ID=your_zoho_client_id
 ZOHO_CLIENT_SECRET=your_zoho_client_secret
@@ -72,23 +87,23 @@ ENCRYPTION_KEY=<run: python -c "from cryptography.fernet import Fernet; print(Fe
 # Required - Your simple admin phrase
 ADMIN_TOKEN=sync my expenses please
 
-# Auto-configured by Railway
+# Railway configuration
 APP_BASE_URL=https://your-app.railway.app
-DATABASE_URL=<auto-provided>
 
 # Optional (defaults shown)
 SYNC_INTERVAL_MINUTES=15
 ENVIRONMENT=production
 ```
 
-### 3. Initial Setup
+### 4. Initial Setup
 After deployment:
 
 1. **Authorize Zoho**: Visit `https://your-app.railway.app/oauth/zoho/login`
 2. **Test sync**: `POST https://your-app.railway.app/admin/sync?secret=sync my expenses please`
 3. **View data**: `https://your-app.railway.app/reports/summary`
+4. **Optional**: Use Supabase dashboard to view your data at [supabase.com](https://supabase.com)
 
-That's it! Your expenses will now sync automatically every 15 minutes.
+That's it! Your expenses will now sync automatically every 15 minutes to your free Supabase database.
 
 ## 📋 API Endpoints
 
@@ -156,9 +171,9 @@ uvicorn app.main:app --reload
 
 Visit `http://localhost:8000/docs` for interactive API documentation.
 
-## 🗄️ Database Schema
+## 🗄️ Database Schema (Supabase PostgreSQL)
 
-The application creates these main tables:
+The application creates these main tables in your Supabase database:
 
 - **`expenses`** - Core expense data synced from Zoho
 - **`oauth_tokens`** - Encrypted OAuth tokens for Zoho API access
@@ -167,6 +182,13 @@ Key fields in `expenses` table:
 - Basic info: `expense_id`, `merchant`, `amount`, `date`, `category`
 - Status: `reimbursement_status`, `approval_status`
 - Metadata: `created_at`, `updated_at`, `last_synced`
+
+### Supabase Benefits:
+- **Free 500MB database** (handles 50,000+ expense records)
+- **Built-in dashboard** for viewing and querying data
+- **Automatic backups** and monitoring
+- **Real-time capabilities** for future features
+- **Direct SQL access** for custom reports
 
 ## 🔧 Configuration
 
