@@ -12,6 +12,13 @@ This application solves the problem of scattered expense data by creating a cent
 
 Perfect for individuals, small businesses, or teams who want full control over their expense data.
 
+## 🔗 **Repository & Deployment**
+
+- **GitHub Repository**: https://github.com/timlihk/expense-tracking
+- **Status**: ✅ Ready for immediate deployment
+- **Database**: Supabase PostgreSQL (free 500MB tier)
+- **Hosting**: Railway (starting at $5/month)
+
 ## ✨ Key Features
 
 ### 📊 **Automated Data Sync**
@@ -106,26 +113,35 @@ After deployment:
 
 That's it! Your expenses will now sync automatically every 15 minutes to your free Supabase database.
 
-## 📋 API Endpoints
+## 📋 Complete API Reference
 
-### Authentication & Setup
-- `GET /health` - Health check
-- `GET /oauth/zoho/login` - Start Zoho OAuth flow
-- `GET /oauth/zoho/callback` - Complete OAuth (automatic)
+### 🏥 **System Health**
+- `GET /health` - System health check and status
 
-### Data Management
-- `GET /expenses` - List expenses with filtering
-- `POST /expenses/mark-reimbursed` - Mark expenses as reimbursed
+### 🔐 **Authentication & Setup**
+- `GET /oauth/zoho/login` - Start Zoho OAuth authorization flow
+- `GET /oauth/zoho/callback` - Complete OAuth (automatic redirect)
 - `POST /admin/sync?secret=your-phrase` - Manual sync trigger
 
-### Kirkland T&E Report Management
-- `POST /expenses/kirkland-te/assign` - Assign T&E report number to expenses
-- `GET /expenses/kirkland-te/{report_number}` - Get expenses by T&E report
-- `GET /expenses/kirkland-te` - List all T&E reports with summaries
+### 💰 **Expense Management**
+- `GET /expenses` - List expenses with optional filtering
+  - Query params: `status`, `limit` (max 500)
+  - Returns: expense list with basic info + T&E report references
+- `POST /expenses/reimburse/mark` - Mark expenses as reimbursed
+  - Body: `{"expense_ids": [123, 456], "amount": 1000.00}`
 
-### Reporting
-- `GET /reports/summary` - Financial summary with date filtering
-- `GET /reports/outstanding` - Outstanding reimbursements
+### 🏢 **Kirkland T&E Report Management**
+- `POST /expenses/kirkland-te/assign` - Assign T&E report number to expenses
+  - Body: `{"expense_ids": [123, 456], "te_report_number": "KTE-2024-001"}`
+  - Auto-updates status to "Submitted for Reimbursement"
+- `GET /expenses/kirkland-te/{report_number}` - Get all expenses for specific T&E report
+- `GET /expenses/kirkland-te` - List all T&E reports with summaries
+  - Returns: report numbers, expense counts, totals, date ranges
+
+### 📊 **Financial Reporting**
+- `GET /reports/summary` - Financial summary with optional date filtering
+  - Query params: `from=YYYY-MM-DD`, `to=YYYY-MM-DD`
+- `GET /reports/outstanding` - List of unreimbursed expenses
 - `GET /reports/ageing` - Aging analysis for overdue expenses
 
 ### Example Usage

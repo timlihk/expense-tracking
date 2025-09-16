@@ -1,8 +1,11 @@
 # Deployment Guide
 
-Quick deployment guide for the Zoho Expense sync application with Supabase database.
+**Repository**: https://github.com/timlihk/expense-tracking
+**Status**: ✅ Ready for immediate deployment
 
-## Railway + Supabase Deployment (Recommended)
+Complete deployment guide for the Zoho Expense sync application with Supabase database.
+
+## 🚀 Railway + Supabase Deployment (Recommended)
 
 ### 1. Prerequisites
 - GitHub account with this repository
@@ -42,8 +45,8 @@ Quick deployment guide for the Zoho Expense sync application with Supabase datab
 
 1. **Connect Repository**:
    - Login to Railway
-   - Create new project
-   - Connect this GitHub repository
+   - Create new project from GitHub
+   - Connect: `https://github.com/timlihk/expense-tracking`
 
 2. **No PostgreSQL needed**:
    - Skip adding Railway PostgreSQL service
@@ -99,9 +102,48 @@ Quick deployment guide for the Zoho Expense sync application with Supabase datab
 
 **Total**: $0-5/month for personal expense tracking
 
-### 5. API Documentation
+## ✨ **What You Get After Deployment**
 
-Once deployed, visit `https://your-app-name.up.railway.app/docs` for interactive API documentation.
+### 🔄 **Automatic Expense Sync**
+- Syncs from Zoho Expense every 15 minutes
+- Encrypted OAuth token storage
+- Incremental updates (only new/changed expenses)
+
+### 💰 **Complete Expense Management**
+- List and filter expenses via REST API
+- Mark expenses as reimbursed
+- Track reimbursement status and amounts
+
+### 🏢 **Kirkland T&E Report Integration**
+- Assign expenses to T&E report numbers
+- Track submission status
+- Generate T&E report summaries
+- Reconcile company reimbursements
+
+### 📊 **Financial Reporting**
+- Summary reports with date filtering
+- Outstanding expense tracking
+- Aging analysis for overdue reimbursements
+- Direct Supabase dashboard access
+
+### 🔧 **Developer-Friendly**
+- Interactive API documentation at `/docs`
+- RESTful endpoints for all operations
+- Simple authentication for personal use
+- Direct PostgreSQL access for custom queries
+
+## 📚 **Post-Deployment Resources**
+
+### 🔗 **Important URLs** (Replace `your-app` with your Railway app name)
+- **Health Check**: `https://your-app.up.railway.app/health`
+- **API Documentation**: `https://your-app.up.railway.app/docs`
+- **Zoho Authorization**: `https://your-app.up.railway.app/oauth/zoho/login`
+- **Reports Summary**: `https://your-app.up.railway.app/reports/summary`
+- **Manual Sync**: `https://your-app.up.railway.app/admin/sync?secret=your-phrase`
+
+### 📊 **Data Access**
+- **Supabase Dashboard**: [supabase.com](https://supabase.com) → Your Project → Table Editor
+- **Direct SQL**: Use Supabase SQL Editor for custom queries
 
 ## Alternative Deployment Options
 
