@@ -121,7 +121,7 @@ That's it! Your expenses will now sync automatically every 15 minutes to your fr
 ### 🔐 **Authentication & Setup**
 - `GET /oauth/zoho/login` - Start Zoho OAuth authorization flow
 - `GET /oauth/zoho/callback` - Complete OAuth (automatic redirect)
-- `POST /admin/sync?secret=your-phrase` - Manual sync trigger
+- `POST /admin/sync` - Manual sync trigger (requires `x-admin-token` header)
 
 ### 💰 **Expense Management**
 - `GET /expenses` - List expenses with optional filtering
@@ -144,6 +144,11 @@ That's it! Your expenses will now sync automatically every 15 minutes to your fr
 - `GET /reports/outstanding` - List of unreimbursed expenses
 - `GET /reports/ageing` - Aging analysis for overdue expenses
 
+### 🔄 **Reconciliation (Company Reports)**
+- `POST /recon/upload` - Upload company T&E report CSV for matching
+- `GET /recon/match-candidates/{merchant}` - Find potential Zoho expense matches
+- `POST /recon/match` - Create match between Zoho expense and company entry
+
 ### Example Usage
 
 ```bash
@@ -154,7 +159,8 @@ curl "https://your-app.railway.app/reports/summary?from=2024-01-01&to=2024-01-31
 curl "https://your-app.railway.app/expenses?status=Not%20Reimbursed&limit=50"
 
 # Trigger manual sync
-curl -X POST "https://your-app.railway.app/admin/sync?secret=sync my expenses please"
+curl -X POST "https://your-app.railway.app/admin/sync" \
+  -H "x-admin-token: sync my expenses please"
 
 # Mark expenses as reimbursed
 curl -X POST "https://your-app.railway.app/expenses/mark-reimbursed" \

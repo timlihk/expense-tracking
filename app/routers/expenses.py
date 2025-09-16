@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Header
 from sqlalchemy.orm import Session
 from sqlalchemy import select
 from pydantic import BaseModel
@@ -93,8 +93,8 @@ def list_te_reports(db: Session = Depends(get_db)):
     } for r in results]
 
 @router.post("/admin/sync")
-def admin_sync(secret: str = "", db: Session = Depends(get_db)):
-    if secret != settings.ADMIN_TOKEN:
+def admin_sync(x_admin_token: str = Header(default=""), db: Session = Depends(get_db)):
+    if x_admin_token != settings.ADMIN_TOKEN:
         raise HTTPException(status_code=401, detail="Unauthorized")
     run_sync(db)
-    return {"ok": True}
+    return {"ok": True, "message": "Sync started"}
