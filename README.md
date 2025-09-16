@@ -43,6 +43,14 @@ Perfect for individuals, small businesses, or teams who want full control over t
 - **Kirkland T&E report tracking** for expense submission reconciliation
 - **Export capabilities** for external analysis
 
+### 🖥️ **Web Dashboard**
+- **Modern Next.js interface** with TypeScript and Tailwind CSS
+- **KPI cards** showing total expenses, recent activity, and sync status
+- **Real-time expense table** with automatic data refreshing via SWR
+- **Manual sync trigger** button for on-demand Zoho synchronization
+- **Responsive design** optimized for desktop and mobile devices
+- **Dark theme** with professional UI components
+
 ### 🔐 **Security & Privacy**
 - **Self-hosted** - your data stays on your infrastructure
 - **Encrypted token storage** using Fernet encryption
@@ -186,11 +194,11 @@ curl "https://your-app.railway.app/expenses/kirkland-te"
 
 ## 🏗️ Local Development
 
-### Setup
+### Backend Setup
 ```bash
 # Clone and setup
-git clone https://github.com/timlihk/Zoho-expense.git
-cd Zoho-expense
+git clone https://github.com/timlihk/expense-tracking.git
+cd expense-tracking
 
 # Create virtual environment
 python -m venv .venv
@@ -204,16 +212,34 @@ cp .env.example .env
 # Edit .env with your credentials
 ```
 
-### Database Setup
+### Frontend Dashboard Setup
 ```bash
-# Run migrations
-alembic upgrade head
+# Navigate to dashboard directory
+cd dashboard
+
+# Install dependencies
+npm install
+
+# Environment setup
+cp .env.local.example .env.local
+# Edit .env.local with your API base URL and admin token
 
 # Start development server
+npm run dev
+```
+
+### Database Setup
+```bash
+# Run migrations (in backend directory)
+alembic upgrade head
+
+# Start backend development server
 uvicorn app.main:app --reload
 ```
 
-Visit `http://localhost:8000/docs` for interactive API documentation.
+Visit:
+- `http://localhost:8000/docs` for interactive API documentation
+- `http://localhost:3000` for the web dashboard (after running `npm run dev` in dashboard/)
 
 ## 🗄️ Database Schema (Supabase PostgreSQL)
 
@@ -361,8 +387,10 @@ GET /expenses/kirkland-te
 - [x] External reference tracking
 - [ ] Reconciliation dashboard
 
-### Phase 3: Frontend
-- [ ] Web dashboard for expense management
+### Phase 3: Frontend (Completed ✅)
+- [x] Web dashboard for expense management
+- [x] KPI cards and expense tables
+- [x] Manual sync trigger UI
 - [ ] Interactive reconciliation interface
 - [ ] Advanced filtering and search
 
