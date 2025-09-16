@@ -74,6 +74,7 @@ def upgrade():
         sa.Column('reimbursed_amount', sa.Numeric(18,2), server_default='0'),
         sa.Column('reimbursed_date', sa.Date()),
         sa.Column('external_ref', sa.Text()),
+        sa.Column('kirkland_te_report', sa.Text()),
         sa.Column('created_at', sa.TIMESTAMP(timezone=True), nullable=False, server_default=sa.text('now()')),
         sa.Column('updated_at', sa.TIMESTAMP(timezone=True), nullable=False, server_default=sa.text('now()'))
     )
@@ -101,8 +102,10 @@ def upgrade():
     op.create_index('idx_expenses_txn_date', 'expenses', ['txn_date'])
     op.create_index('idx_expenses_report_id', 'expenses', ['report_id'])
     op.create_index('idx_expenses_status', 'expenses', ['reimbursement_status'])
+    op.create_index('idx_expenses_kirkland_te_report', 'expenses', ['kirkland_te_report'])
 
 def downgrade():
+    op.drop_index('idx_expenses_kirkland_te_report', table_name='expenses')
     op.drop_index('idx_expenses_status', table_name='expenses')
     op.drop_index('idx_expenses_report_id', table_name='expenses')
     op.drop_index('idx_expenses_txn_date', table_name='expenses')
