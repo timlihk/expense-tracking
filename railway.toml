@@ -1,0 +1,6 @@
+[build]
+builder = "Dockerfile"
+
+[env]
+PORT = "8080"
+PYTHONUNBUFFERED = "1"
