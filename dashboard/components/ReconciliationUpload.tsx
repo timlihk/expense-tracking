@@ -1,6 +1,6 @@
 'use client';
 import React, { useState } from 'react';
-import { uploadReconciliation } from '../lib/api';
+import { uploadReconCSV } from '../lib/api';
 
 interface UploadResult {
   total_rows: number;
@@ -33,7 +33,7 @@ export function ReconciliationUpload() {
     setResult(null);
 
     try {
-      const uploadResult = await uploadReconciliation(file);
+      const uploadResult = await uploadReconCSV(file);
       setResult(uploadResult);
     } catch (err: any) {
       setError(err.message);

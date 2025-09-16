@@ -36,24 +36,28 @@ export async function fetchAgeing() {
   return get(`/reports/ageing`);
 }
 
+// Analytics endpoints for charts
+export async function fetchByCategory() {
+  return get<{category:string; total:number;}[]>(`/reports/by_category`);
+}
+
+export async function fetchByMerchant() {
+  return get<{merchant:string; total:number;}[]>(`/reports/by_merchant`);
+}
+
+export async function fetchTrends() {
+  return get<{date:string; total:number;}[]>(`/reports/trends`);
+}
+
 // Secure endpoints via Next.js API routes
 export async function triggerSync() {
   return post(`/api/sync`);
 }
 
-export async function uploadReconciliation(file: File) {
-  const formData = new FormData();
-  formData.append('file', file);
-
-  const res = await fetch('/api/upload', {
-    method: 'POST',
-    body: formData,
-  });
-
-  if (!res.ok) {
-    const errorData = await res.json().catch(() => ({}));
-    throw new Error(errorData.error || `Upload failed: ${res.status}`);
-  }
-
+export async function uploadReconCSV(file: File) {
+  const form = new FormData();
+  form.append('file', file);
+  const res = await fetch('/api/recon', { method: 'POST', body: form });
+  if (!res.ok) throw new Error('Upload failed');
   return res.json();
 }

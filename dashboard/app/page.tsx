@@ -3,19 +3,18 @@ import React, { useState } from 'react';
 import useSWR from 'swr';
 import { KPI } from '../components/KPI';
 import { ExpensesTable } from '../components/ExpensesTable';
-import { SpendByCategory } from '../components/SpendByCategory';
-import { TopMerchants } from '../components/TopMerchants';
-import { SpendTrend } from '../components/SpendTrend';
+import { PieCard, BarCard, LineCard } from '../components/ChartCard';
 import { ReconciliationUpload } from '../components/ReconciliationUpload';
-import { fetchSummary, fetchExpenses, fetchOutstanding, fetchAgeing, triggerSync } from '../lib/api';
 import {
-  generateCategoryData,
-  generateMerchantData,
-  generateTrendData,
-  generateMockCategoryData,
-  generateMockMerchantData,
-  generateMockTrendData
-} from '../lib/chartData';
+  fetchSummary,
+  fetchExpenses,
+  fetchOutstanding,
+  fetchAgeing,
+  fetchByCategory,
+  fetchByMerchant,
+  fetchTrends,
+  triggerSync
+} from '../lib/api';
 
 export default function Dashboard() {
   const { data: summary } = useSWR('summary', fetchSummary);
@@ -23,13 +22,13 @@ export default function Dashboard() {
   const { data: outstanding } = useSWR('outstanding', fetchOutstanding);
   const { data: ageing } = useSWR('ageing', fetchAgeing);
 
+  // New analytics data
+  const { data: byCategory } = useSWR('byCategory', fetchByCategory);
+  const { data: byMerchant } = useSWR('byMerchant', fetchByMerchant);
+  const { data: trends } = useSWR('trends', fetchTrends);
+
   const [syncMsg, setSyncMsg] = useState<string | null>(null);
   const [isSyncing, setIsSyncing] = useState(false);
-
-  // Generate chart data
-  const categoryData = expenses?.length ? generateCategoryData(expenses) : generateMockCategoryData();
-  const merchantData = expenses?.length ? generateMerchantData(expenses) : generateMockMerchantData();
-  const trendData = expenses?.length ? generateTrendData(expenses) : generateMockTrendData();
 
   async function onSync() {
     setIsSyncing(true);
@@ -86,17 +85,15 @@ export default function Dashboard() {
         )}
       </div>
 
-      {/* Charts Row 1 */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <SpendByCategory data={categoryData} />
-        <TopMerchants data={merchantData} />
+      {/* Analytics Charts */}
+      <div className="grid md:grid-cols-3 gap-4">
+        <PieCard title="Spend by Category" data={byCategory || []} nameKey="category" valueKey="total" />
+        <BarCard title="Top Merchants" data={byMerchant || []} xKey="merchant" yKey="total" />
+        <LineCard title="Spending Trend" data={trends || []} xKey="date" yKey="total" />
       </div>
 
-      {/* Charts Row 2 */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <SpendTrend data={trendData} />
-        <ReconciliationUpload />
-      </div>
+      {/* Reconciliation */}
+      <ReconciliationUpload />
 
       {/* Expenses Table */}
       <ExpensesTable rows={expenses || []} />
