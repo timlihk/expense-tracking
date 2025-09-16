@@ -1,6 +1,6 @@
-# T&E Dashboard
+# World-Class T&E Dashboard
 
-A modern Next.js dashboard for the Zoho Expense tracking system.
+An enterprise-grade Next.js 14 dashboard for the Zoho Expense tracking system with advanced analytics, security hardening, and professional UI/UX.
 
 ## 🚀 Quick Start
 
@@ -8,9 +8,9 @@ A modern Next.js dashboard for the Zoho Expense tracking system.
 # Install dependencies
 npm install
 
-# Set up environment
+# Set up environment (SECURE)
 cp .env.local.example .env.local
-# Edit .env.local with your API configuration
+# Edit .env.local with your configuration (see below)
 
 # Start development server
 npm run dev
@@ -23,12 +23,15 @@ Visit http://localhost:3000
 Edit `.env.local`:
 
 ```bash
-# Point to your FastAPI backend
-NEXT_PUBLIC_API_BASE=http://localhost:8080
+# PUBLIC: Exposed to browser for direct API calls
+NEXT_PUBLIC_API_BASE=http://localhost:8000
 
-# Your admin token for sync operations
-NEXT_PUBLIC_ADMIN_TOKEN=sync my expenses please
+# SERVER-SIDE ONLY: Used in Next.js API routes (NEVER exposed to browser)
+API_BASE=http://localhost:8000
+ADMIN_TOKEN=sync my expenses please
 ```
+
+⚠️ **CRITICAL SECURITY**: The `ADMIN_TOKEN` is only used server-side in `/api/sync` and `/api/recon` routes. This prevents credential exposure to the browser, eliminating security vulnerabilities.
 
 ## 📊 Features
 

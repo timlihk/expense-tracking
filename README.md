@@ -43,21 +43,25 @@ Perfect for individuals, small businesses, or teams who want full control over t
 - **Kirkland T&E report tracking** for expense submission reconciliation
 - **Export capabilities** for external analysis
 
-### 🖥️ **Web Dashboard**
-- **Modern Next.js interface** with TypeScript and Tailwind CSS
-- **KPI cards** showing total expenses, recent activity, and sync status
-- **Real-time expense table** with automatic data refreshing via SWR
-- **Manual sync trigger** button for on-demand Zoho synchronization
-- **Responsive design** optimized for desktop and mobile devices
-- **Dark theme** with professional UI components
+### 🖥️ **World-Class Web Dashboard**
+- **Modern Next.js 14** with TypeScript, Tailwind CSS, and App Router
+- **Advanced Analytics**: Category pie charts, merchant bar charts, spending trend analysis
+- **KPI Dashboard**: Total expenses, outstanding amounts, recent transaction counts
+- **Enhanced Expense Table**: Color-coded status badges, category tags, hover effects
+- **Secure Operations**: Server-side API proxy protects admin tokens from browser exposure
+- **CSV Reconciliation**: Upload company T&E reports with match detection and confidence scoring
+- **Real-time Updates**: SWR data fetching with automatic refresh after sync operations
+- **Professional UI/UX**: Dark theme, smooth transitions, responsive design, custom scrollbars
+- **Mobile Optimized**: Responsive grids that stack gracefully on all screen sizes
 
-### 🔐 **Security & Privacy**
-- **Self-hosted** - your data stays on your infrastructure
-- **Encrypted token storage** using Fernet encryption
-- **Header-based authentication** with secure token validation
-- **Rate limiting** prevents API abuse and DDoS attacks
-- **CORS middleware** with security headers (HSTS enabled)
-- **Environment-based configuration** for secure deployment
+### 🔐 **Enterprise Security & Privacy**
+- **Self-hosted** - your data stays on your infrastructure (never touches third-party servers)
+- **Zero token exposure** - admin tokens secured server-side via Next.js API proxy routes
+- **Encrypted OAuth storage** using Fernet encryption for sensitive Zoho credentials
+- **Production-grade authentication** with secure header-based token validation
+- **API rate limiting** prevents abuse and DDoS attacks (configurable per endpoint)
+- **Security headers** - CORS middleware with HSTS, CSP, and XSS protection
+- **Environment separation** - clear distinction between public and private configuration
 
 ## 🚀 Quick Start
 
@@ -125,6 +129,28 @@ After deployment:
 4. **Optional**: Use Supabase dashboard to view your data at [supabase.com](https://supabase.com)
 
 That's it! Your expenses will now sync automatically every 15 minutes to your free Supabase database.
+
+### 5. Deploy Dashboard (Optional)
+
+For the web dashboard, deploy to Vercel or Netlify:
+
+**Vercel (Recommended)**:
+```bash
+cd dashboard
+vercel --prod
+```
+
+**Environment Variables for Dashboard Deployment**:
+```bash
+# PUBLIC (safe to expose)
+NEXT_PUBLIC_API_BASE=https://your-app.railway.app
+
+# SERVER-SIDE ONLY (critical security)
+API_BASE=https://your-app.railway.app
+ADMIN_TOKEN=sync my expenses please
+```
+
+⚠️ **SECURITY**: Never set `NEXT_PUBLIC_ADMIN_TOKEN` - this exposes credentials to browsers. Use server-side `ADMIN_TOKEN` only.
 
 ## 📋 Complete API Reference
 
@@ -220,13 +246,18 @@ cd dashboard
 # Install dependencies
 npm install
 
-# Environment setup
+# Environment setup (SECURE)
 cp .env.local.example .env.local
-# Edit .env.local with your API base URL and admin token
+# Edit .env.local:
+# NEXT_PUBLIC_API_BASE=http://localhost:8000  # Public API endpoints
+# API_BASE=http://localhost:8000              # Server-side proxy target
+# ADMIN_TOKEN=sync my expenses please         # Server-side only (NEVER public)
 
 # Start development server
 npm run dev
 ```
+
+⚠️ **Security Note**: The `ADMIN_TOKEN` is only used server-side in Next.js API routes (`/api/sync`, `/api/recon`). It's never exposed to the browser, ensuring zero credential leakage.
 
 ### Database Setup
 ```bash
@@ -347,27 +378,34 @@ GET /expenses/kirkland-te
 
 ### Tech Stack
 - **Backend**: FastAPI (Python 3.12) with async/await patterns
+- **Frontend**: Next.js 14 with TypeScript, Tailwind CSS, App Router
 - **Database**: PostgreSQL with SQLAlchemy ORM and advisory locks
+- **Charts**: Recharts with custom themes and responsive design
+- **Data Fetching**: SWR for real-time updates and caching
 - **Migrations**: Alembic for schema management
 - **Scheduling**: APScheduler for background sync
-- **Security**: Fernet encryption, rate limiting, CORS + HSTS
+- **Security**: Server-side API proxy, Fernet encryption, rate limiting, CORS + HSTS
 - **Testing**: pytest with comprehensive coverage
 - **CI/CD**: GitHub Actions with automated testing
-- **Deployment**: Docker on Railway
+- **Deployment**: Backend on Railway, Frontend on Vercel/Netlify
 
 ### Data Flow
-1. **OAuth Setup** → Secure token storage
-2. **Scheduled Sync** → Incremental data fetch from Zoho
-3. **API Access** → RESTful endpoints for data access
-4. **Reporting** → SQL-based analysis and summaries
+1. **OAuth Setup** → Secure Zoho token storage with Fernet encryption
+2. **Scheduled Sync** → Incremental data fetch from Zoho with cursor pagination
+3. **API Access** → RESTful FastAPI endpoints for data access
+4. **Dashboard Analytics** → Next.js frontend with real-time visualizations
+5. **Secure Operations** → Server-side proxy for admin functions (sync, reconciliation)
+6. **Reporting** → SQL-based analysis with interactive charts and tables
 
 ### Production-Grade Features
 - **Concurrency Control**: PostgreSQL advisory locks prevent duplicate sync runs
 - **Data Integrity**: Atomic upserts with `ON CONFLICT DO UPDATE` for idempotent operations
+- **Zero Credential Exposure**: Admin tokens secured via server-side Next.js API routes
 - **API Protection**: Rate limiting with configurable limits per endpoint
-- **Security Headers**: CORS middleware with HSTS for enhanced security
+- **Security Headers**: CORS middleware with HSTS, CSP, and XSS protection
+- **Real-time Analytics**: Interactive charts with category, merchant, and trend analysis
 - **Comprehensive Testing**: Full test coverage with CI/CD automation
-- **Error Recovery**: Detailed sync status tracking and error handling
+- **Error Recovery**: Detailed sync status tracking and graceful error handling
 
 ## 🚧 Roadmap
 
