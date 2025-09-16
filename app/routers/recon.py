@@ -1,15 +1,21 @@
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Request
 from sqlalchemy.orm import Session
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 from app.db import get_db
 from app.models import Expense
 import csv
 import io
 from typing import List, Dict, Any
 
+limiter = Limiter(key_func=get_remote_address)
+
 router = APIRouter(prefix="/recon", tags=["reconciliation"])
 
 @router.post("/upload")
+@limiter.limit("5/minute")  # Limited uploads to prevent abuse
 async def upload_company_report(
+    request: Request,
     file: UploadFile = File(...),
     db: Session = Depends(get_db)
 ):

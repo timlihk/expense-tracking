@@ -1,5 +1,9 @@
 from fastapi import FastAPI, Response
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from sqlalchemy.orm import Session
 from app.config import settings
@@ -12,6 +16,17 @@ from app.routers.recon import router as recon_router
 
 app = FastAPI(title="T&E Master Ledger")
 
+# Rate limiting setup
+limiter = Limiter(key_func=get_remote_address, default_limits=["120/minute"])
+app.state.limiter = limiter
+
+@app.exception_handler(RateLimitExceeded)
+async def rate_limit_handler(request, exc):
+    return JSONResponse(
+        status_code=429,
+        content={"ok": False, "error": "rate_limited", "detail": str(exc)}
+    )
+
 # CORS middleware for cross-origin requests
 app.add_middleware(
     CORSMiddleware,
@@ -22,7 +37,8 @@ app.add_middleware(
 )
 
 @app.get("/health")
-async def health(response: Response):
+@limiter.limit("60/minute")
+async def health(request, response: Response):
     # Add HSTS header for production HTTPS
     response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
 

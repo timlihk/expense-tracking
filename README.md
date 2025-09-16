@@ -21,11 +21,14 @@ Perfect for individuals, small businesses, or teams who want full control over t
 
 ## ✨ Key Features
 
-### 📊 **Automated Data Sync**
-- **Incremental sync** from Zoho Expense every 15 minutes (configurable)
-- **Manual sync trigger** with simple URL parameter authentication
+### 📊 **Production-Grade Data Sync**
+- **Incremental sync** with cursor-based pagination from Zoho Expense
+- **Advisory locks** prevent concurrent sync runs in scaled deployments
+- **Atomic upserts** ensure idempotent operations and data consistency
+- **Error recovery** with detailed sync status tracking
+- **Manual sync trigger** with secure header-based authentication
+- **Rate limiting** protects against API abuse (10 sync requests/minute)
 - **Secure OAuth integration** with encrypted token storage
-- **Handles attachments** and receipt data
 
 ### 💰 **Expense Management**
 - **Complete expense tracking** with merchant, amount, date, category
@@ -43,7 +46,9 @@ Perfect for individuals, small businesses, or teams who want full control over t
 ### 🔐 **Security & Privacy**
 - **Self-hosted** - your data stays on your infrastructure
 - **Encrypted token storage** using Fernet encryption
-- **Simple phrase-based authentication** for personal use
+- **Header-based authentication** with secure token validation
+- **Rate limiting** prevents API abuse and DDoS attacks
+- **CORS middleware** with security headers (HSTS enabled)
 - **Environment-based configuration** for secure deployment
 
 ## 🚀 Quick Start
@@ -107,7 +112,7 @@ ENVIRONMENT=production
 After deployment:
 
 1. **Authorize Zoho**: Visit `https://your-app.railway.app/oauth/zoho/login`
-2. **Test sync**: `POST https://your-app.railway.app/admin/sync?secret=sync my expenses please`
+2. **Test sync**: `curl -X POST "https://your-app.railway.app/admin/sync" -H "x-admin-token: sync my expenses please"`
 3. **View data**: `https://your-app.railway.app/reports/summary`
 4. **Optional**: Use Supabase dashboard to view your data at [supabase.com](https://supabase.com)
 
@@ -158,7 +163,7 @@ curl "https://your-app.railway.app/reports/summary?from=2024-01-01&to=2024-01-31
 # List unreimbursed expenses
 curl "https://your-app.railway.app/expenses?status=Not%20Reimbursed&limit=50"
 
-# Trigger manual sync
+# Trigger manual sync (rate limited: 10/minute)
 curl -X POST "https://your-app.railway.app/admin/sync" \
   -H "x-admin-token: sync my expenses please"
 
@@ -315,11 +320,13 @@ GET /expenses/kirkland-te
 ## 🛠️ Architecture
 
 ### Tech Stack
-- **Backend**: FastAPI (Python 3.12)
-- **Database**: PostgreSQL with SQLAlchemy ORM
-- **Migrations**: Alembic
+- **Backend**: FastAPI (Python 3.12) with async/await patterns
+- **Database**: PostgreSQL with SQLAlchemy ORM and advisory locks
+- **Migrations**: Alembic for schema management
 - **Scheduling**: APScheduler for background sync
-- **Security**: Fernet encryption for sensitive data
+- **Security**: Fernet encryption, rate limiting, CORS + HSTS
+- **Testing**: pytest with comprehensive coverage
+- **CI/CD**: GitHub Actions with automated testing
 - **Deployment**: Docker on Railway
 
 ### Data Flow
@@ -328,19 +335,30 @@ GET /expenses/kirkland-te
 3. **API Access** → RESTful endpoints for data access
 4. **Reporting** → SQL-based analysis and summaries
 
+### Production-Grade Features
+- **Concurrency Control**: PostgreSQL advisory locks prevent duplicate sync runs
+- **Data Integrity**: Atomic upserts with `ON CONFLICT DO UPDATE` for idempotent operations
+- **API Protection**: Rate limiting with configurable limits per endpoint
+- **Security Headers**: CORS middleware with HSTS for enhanced security
+- **Comprehensive Testing**: Full test coverage with CI/CD automation
+- **Error Recovery**: Detailed sync status tracking and error handling
+
 ## 🚧 Roadmap
 
-### Phase 1: Stabilization (Current)
+### Phase 1: Stabilization (Completed ✅)
 - [x] Core sync functionality
 - [x] Basic reporting endpoints
 - [x] Railway deployment
-- [ ] Enhanced error handling and logging
-- [ ] Comprehensive test suite
+- [x] Enhanced error handling and logging
+- [x] Comprehensive test suite
+- [x] Production-grade sync engine with advisory locks
+- [x] API rate limiting and security headers
+- [x] GitHub Actions CI/CD pipeline
 
-### Phase 2: Reconciliation
-- [ ] CSV upload for company reports
-- [ ] Fuzzy matching logic for expense reconciliation
-- [ ] External reference tracking
+### Phase 2: Reconciliation (Completed ✅)
+- [x] CSV upload for company reports
+- [x] Fuzzy matching logic for expense reconciliation
+- [x] External reference tracking
 - [ ] Reconciliation dashboard
 
 ### Phase 3: Frontend

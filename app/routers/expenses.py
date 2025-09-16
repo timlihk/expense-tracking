@@ -1,11 +1,15 @@
-from fastapi import APIRouter, Depends, HTTPException, Header
+from fastapi import APIRouter, Depends, HTTPException, Header, Request
 from sqlalchemy.orm import Session
 from sqlalchemy import select
 from pydantic import BaseModel
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 from app.db import get_db
 from app.models import Expense
 from app.config import settings
 from app.sync import run_sync
+
+limiter = Limiter(key_func=get_remote_address)
 
 router = APIRouter(prefix="/expenses", tags=["expenses"])
 
@@ -93,7 +97,8 @@ def list_te_reports(db: Session = Depends(get_db)):
     } for r in results]
 
 @router.post("/admin/sync")
-def admin_sync(x_admin_token: str = Header(default=""), db: Session = Depends(get_db)):
+@limiter.limit("10/minute")  # Strict limit for admin operations
+def admin_sync(request: Request, x_admin_token: str = Header(default=""), db: Session = Depends(get_db)):
     if x_admin_token != settings.ADMIN_TOKEN:
         raise HTTPException(status_code=401, detail="Unauthorized")
     run_sync(db)
