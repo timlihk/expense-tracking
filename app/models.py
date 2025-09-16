@@ -62,6 +62,7 @@ class Expense(Base):
     reimbursed_amount = Column(Numeric(18,2), default=0)
     reimbursed_date = Column(Date)
     external_ref = Column(Text)
+    kirkland_te_report = Column(Text)  # Kirkland T&E report reference/number
 
 class Attachment(Base):
     __tablename__ = "attachments"

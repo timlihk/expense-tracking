@@ -30,6 +30,7 @@ Perfect for individuals, small businesses, or teams who want full control over t
 - **Summary reports** with date range filtering
 - **Outstanding expenses** tracking for cash flow management
 - **Aging reports** to identify overdue reimbursements
+- **Kirkland T&E report tracking** for expense submission reconciliation
 - **Export capabilities** for external analysis
 
 ### 🔐 **Security & Privacy**
@@ -117,6 +118,11 @@ That's it! Your expenses will now sync automatically every 15 minutes to your fr
 - `POST /expenses/mark-reimbursed` - Mark expenses as reimbursed
 - `POST /admin/sync?secret=your-phrase` - Manual sync trigger
 
+### Kirkland T&E Report Management
+- `POST /expenses/kirkland-te/assign` - Assign T&E report number to expenses
+- `GET /expenses/kirkland-te/{report_number}` - Get expenses by T&E report
+- `GET /expenses/kirkland-te` - List all T&E reports with summaries
+
 ### Reporting
 - `GET /reports/summary` - Financial summary with date filtering
 - `GET /reports/outstanding` - Outstanding reimbursements
@@ -138,6 +144,17 @@ curl -X POST "https://your-app.railway.app/admin/sync?secret=sync my expenses pl
 curl -X POST "https://your-app.railway.app/expenses/mark-reimbursed" \
   -H "Content-Type: application/json" \
   -d '{"expense_ids": ["exp_123", "exp_456"]}'
+
+# Assign expenses to Kirkland T&E report
+curl -X POST "https://your-app.railway.app/expenses/kirkland-te/assign" \
+  -H "Content-Type: application/json" \
+  -d '{"expense_ids": [123, 456], "te_report_number": "KTE-2024-001"}'
+
+# Get expenses for specific T&E report
+curl "https://your-app.railway.app/expenses/kirkland-te/KTE-2024-001"
+
+# List all T&E reports with summaries
+curl "https://your-app.railway.app/expenses/kirkland-te"
 ```
 
 ## 🏗️ Local Development
@@ -181,6 +198,7 @@ The application creates these main tables in your Supabase database:
 Key fields in `expenses` table:
 - Basic info: `expense_id`, `merchant`, `amount`, `date`, `category`
 - Status: `reimbursement_status`, `approval_status`
+- T&E Tracking: `kirkland_te_report` (Kirkland T&E report reference)
 - Metadata: `created_at`, `updated_at`, `last_synced`
 
 ### Supabase Benefits:
@@ -227,12 +245,49 @@ Direct PostgreSQL access allows for custom reporting:
 ```sql
 -- Monthly spending by category
 SELECT
-    DATE_TRUNC('month', date) as month,
-    category,
+    DATE_TRUNC('month', txn_date) as month,
+    category_id,
     SUM(amount) as total
 FROM expenses
-GROUP BY month, category
+GROUP BY month, category_id
 ORDER BY month DESC, total DESC;
+
+-- Expenses by Kirkland T&E report
+SELECT
+    kirkland_te_report,
+    COUNT(*) as expense_count,
+    SUM(amount) as total_amount,
+    MIN(txn_date) as earliest_expense,
+    MAX(txn_date) as latest_expense
+FROM expenses
+WHERE kirkland_te_report IS NOT NULL
+GROUP BY kirkland_te_report;
+```
+
+## 🏢 Kirkland T&E Report Workflow
+
+### **Typical Usage Flow:**
+1. **Expenses sync** automatically from Zoho every 15 minutes
+2. **Review expenses** via `/expenses` endpoint
+3. **Group expenses** for submission to Kirkland T&E
+4. **Assign T&E report number** using `/kirkland-te/assign`
+5. **Track submissions** via `/kirkland-te` endpoint
+6. **Monitor reimbursement status** in reports
+
+### **T&E Report Management:**
+```bash
+# Group expenses for T&E submission
+POST /expenses/kirkland-te/assign
+{
+  "expense_ids": [123, 124, 125],
+  "te_report_number": "KTE-2024-Q1-001"
+}
+
+# View all expenses in a T&E report
+GET /expenses/kirkland-te/KTE-2024-Q1-001
+
+# Get summary of all T&E reports
+GET /expenses/kirkland-te
 ```
 
 ## 🛠️ Architecture
